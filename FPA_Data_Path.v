@@ -11,7 +11,8 @@ module FPA_Data_Path(
     output wire [4:0] mant,                 // outgoing state data to contoller
     output wire ans_sign,                   // outgoing data (external)
     output wire [3:0] ans_exp,              // outgoing data (external)
-    output wire [2:0] ans_mant              // outgoing data (external)
+    output wire [2:0] ans_mant,             // outgoing data (external)
+    output wire [3:0] ans_except            // outgoing data (external)
 );
 
     // LOAD stage wires
@@ -149,7 +150,9 @@ module FPA_Data_Path(
     // 5. assign outgoing computation data for controller
     assign mant = norm_en ? mant_norm_q : mant_add_q;
     
-    // SEND FINAL OUTPUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // SEt FINAL OUTPUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    assign ans_except = {zero, except1, except2, except3};
+    
     D_Latch_Reg #(4) exp_done_reg(.clk(clk),
                                   .clr(clr),
                                   .en(done_en),
