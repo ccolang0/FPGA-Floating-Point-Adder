@@ -2,7 +2,7 @@
 
 module FPA_Data_Path(
     input wire clk, clr,                    // external timing inputs
-    input wire [1:0] a_sign, b_sign,        // external data inputs
+    input wire a_sign, b_sign,              // external data inputs
     input wire [3:0] a_exp, b_exp,          // external data inputs
     input wire [2:0] a_mant, b_mant,        // external data inputs
     input wire load_en, add_en, norm_en,    // internal inputs from controller (reg enables)
