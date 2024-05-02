@@ -5,14 +5,18 @@ module FPA_Data_Path(
     input wire a_sign, b_sign,              // external data inputs
     input wire [3:0] a_exp, b_exp,          // external data inputs
     input wire [2:0] a_mant, b_mant,        // external data inputs
-    input wire load_en, add_en, norm_en,    // internal inputs from controller (reg enables)
+    input wire load_en, add_en,             // internal inputs from controller (reg enables)
+               norm_en, done_en,                            // from controller (reg enables)
                shift_right, norm_load,                      // from controller (MUX selects)
-    input wire add_except, norm_except,     // outgoing state data to controller (exceptions)
+    output wire add_except, norm_except,     // outgoing state data to controller (exceptions)
     output wire [4:0] mant,                 // outgoing state data to contoller
     output wire ans_sign,                   // outgoing data (external)
     output wire [3:0] ans_exp,              // outgoing data (external)
     output wire [2:0] ans_mant,             // outgoing data (external)
     output wire [3:0] ans_except            // outgoing data (external)
+//    ,output wire sign_gt_d, sign_ls_d, sign_gt_q, sign_ls_q
+//    ,output wire [3:0] exp_gt_d, exp_ls_d, exp_gt_q, exp_ls_q
+//    ,output wire [4:0] mant_gt_d, mant_ls_d, mant_gt_q, mant_ls_q
 );
 
     // LOAD stage wires
@@ -143,12 +147,12 @@ module FPA_Data_Path(
     
     // 4. check for exceptions:
     // --- INFINITIES or NaN
-    assign except2 = exp_norm_q == 3'b111;
+    assign except3 = exp_norm_q == 3'b111;
     // --> encode state data for controller
-    assign norm_except = except2;
+    assign norm_except = except3;
     
     // 5. assign outgoing computation data for controller
-    assign mant = norm_en ? mant_norm_q : mant_add_q;
+    assign mant = norm_en ? mant_norm_d : mant_add_q;
     
     // SEt FINAL OUTPUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     assign ans_except = {zero, except1, except2, except3};
@@ -159,10 +163,10 @@ module FPA_Data_Path(
                                   .d(exp_norm_q),
                                   .q(ans_exp));
                                 
-    D_Latch_Reg #(5) mant_done_reg(.clk(clk),
+    D_Latch_Reg #(3) mant_done_reg(.clk(clk),
                                    .clr(clr),
                                    .en(done_en),
-                                   .d(mant_norm_q),
-                                   .q(ans_mant));
+                                   .d(mant_norm_q[2:0]),
+                                   .q(ans_mant[2:0]));
     
 endmodule
