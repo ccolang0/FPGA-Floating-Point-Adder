@@ -7,11 +7,11 @@ module FPA_Controller(
     output reg load_en, add_en,             // outgoing signals to datapath
                norm_en, done_en,
                shift_right, shift_left, norm_load
-    ,output reg [2:0] pres, next
+//    ,output reg [2:0] pres, next
 );
 
     // State variables and values
-//    reg [2:0] pres, next;
+    reg [2:0] pres, next;
     parameter idle = 3'b000, load = 3'b001, add = 3'b010, load_norm = 3'b011, norm = 3'b100, done = 3'b101;
     
     // State registers update block
@@ -50,9 +50,6 @@ module FPA_Controller(
             load_norm:  begin
                             norm_load <= 1;
                             norm_en <= 1;
-//                            shift_right <= mant[4] == 1;
-                            shift_right <= mant[4] == 1;
-                            shift_left <= mant[4] != 1;
                         end
             norm:       begin
                             norm_en <= 1;

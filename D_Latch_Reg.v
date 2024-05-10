@@ -8,7 +8,7 @@ module D_Latch_Reg #(parameter N = 4)(
     
     always @(posedge clr or posedge clk) begin
         if (clr)
-            q = 0;
+            q <= 0;
         else if (en)
             q <= d;
         end

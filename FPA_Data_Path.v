@@ -9,7 +9,7 @@ module FPA_Data_Path(
                norm_en, done_en,                            // from controller (reg enables)
                shift_right, shift_left,                     // from controller (shift selects)
                norm_load,                                   // from controller (MUX selects)
-    output wire add_except, norm_except,     // outgoing state data to controller (exceptions)
+    output wire add_except, norm_except,    // outgoing state data to controller (exceptions)
     output wire [4:0] mant,                 // outgoing state data to contoller
     output wire ans_sign,                   // outgoing data (external)
     output wire [3:0] ans_exp,              // outgoing data (external)
@@ -126,8 +126,11 @@ module FPA_Data_Path(
     
     // NORMALIZE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // 1. assign intermediates
-    assign exp_norm_shift = shift_right ? exp_norm_q + 1 : (shift_left ? exp_norm_q - 1 : exp_norm_q);
-    assign mant_norm_shift = shift_right ? mant_norm_q >> 1 : (shift_left ? mant_norm_q << 1 : mant_norm_q);
+//    always @(posedge norm_load) begin
+        
+//    end
+    assign exp_norm_shift = shift_left ? exp_norm_q - 1 : (shift_right ? exp_norm_q + 1 : exp_norm_q);
+    assign mant_norm_shift = shift_left ? mant_norm_q << 1 : (shift_right ? mant_norm_q >> 1 : mant_norm_q);
     
     // 2. assign latch inputs
     assign exp_norm_d = norm_load ? exp_add_q : exp_norm_shift;
@@ -148,12 +151,12 @@ module FPA_Data_Path(
     
     // 4. check for exceptions:
     // --- INFINITIES or NaN
-    assign except3 = exp_norm_q == 3'b111;
+    assign except3 = exp_norm_q == 4'b1111;
     // --> encode state data for controller
     assign norm_except = except3;
     
     // 5. assign outgoing computation data for controller
-    assign mant = norm_en ? mant_norm_d : mant_add_q;
+    assign mant = norm_en ? mant_norm_q : mant_add_q;
     
     // SEt FINAL OUTPUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     assign ans_except = {zero, except1, except2, except3};
