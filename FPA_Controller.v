@@ -6,7 +6,7 @@ module FPA_Controller(
                [4:0] mant,
     output reg load_en, add_en,             // outgoing signals to datapath
                norm_en, done_en,
-               shift_right, norm_load
+               shift_right, shift_left, norm_load
     ,output reg [2:0] pres, next
 );
 
@@ -36,7 +36,7 @@ module FPA_Controller(
     
     // Output combinational logic -- using Moore machine state diagram
     always @(*) begin
-        load_en = 0; add_en = 0; done_en = 0; shift_right = 0; norm_load = 0;
+        load_en = 0; add_en = 0; done_en = 0;
         case (pres)
             idle:       norm_en <= 0;
             load:       begin
@@ -51,10 +51,14 @@ module FPA_Controller(
                             norm_load <= 1;
                             norm_en <= 1;
 //                            shift_right <= mant[4] == 1;
+                            shift_right <= mant[4] == 1;
+                            shift_left <= mant[4] != 1;
                         end
             norm:       begin
                             norm_en <= 1;
+                            norm_load <= 0;
                             shift_right <= mant[4] == 1;
+                            shift_left <= mant[4] != 1;
                         end
             done:       done_en <= 1;
         endcase

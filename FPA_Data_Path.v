@@ -7,7 +7,8 @@ module FPA_Data_Path(
     input wire [2:0] a_mant, b_mant,        // external data inputs
     input wire load_en, add_en,             // internal inputs from controller (reg enables)
                norm_en, done_en,                            // from controller (reg enables)
-               shift_right, norm_load,                      // from controller (MUX selects)
+               shift_right, shift_left,                     // from controller (shift selects)
+               norm_load,                                   // from controller (MUX selects)
     output wire add_except, norm_except,     // outgoing state data to controller (exceptions)
     output wire [4:0] mant,                 // outgoing state data to contoller
     output wire ans_sign,                   // outgoing data (external)
@@ -125,8 +126,8 @@ module FPA_Data_Path(
     
     // NORMALIZE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // 1. assign intermediates
-    assign exp_norm_shift = shift_right ? exp_norm_q + 1 : exp_norm_q - 1;
-    assign mant_norm_shift = shift_right ? mant_norm_q >> 1 : mant_norm_q << 1;
+    assign exp_norm_shift = shift_right ? exp_norm_q + 1 : (shift_left ? exp_norm_q - 1 : exp_norm_q);
+    assign mant_norm_shift = shift_right ? mant_norm_q >> 1 : (shift_left ? mant_norm_q << 1 : mant_norm_q);
     
     // 2. assign latch inputs
     assign exp_norm_d = norm_load ? exp_add_q : exp_norm_shift;

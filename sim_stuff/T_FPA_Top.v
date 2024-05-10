@@ -12,6 +12,7 @@ module T_FPA_Top;
     wire [2:0] pres, next;
     wire [4:0] mant;
     wire shift_right;
+    wire shift_left;
 
     FPA_Top fpa(.clk(clk),
                 .clr(clr),
@@ -23,7 +24,14 @@ module T_FPA_Top;
                 ,.pres(pres)
                 ,.next(next)
                 ,.mant(mant)
-                ,.shift_right(shift_right));
+                ,.shift_right(shift_right)
+                ,.shift_left(shift_left)
+                ,.load_en(load_en)
+                ,.add_en(add_en)
+                ,.norm_en(norm_en)
+                ,.done_en(done_en)
+                ,.norm_load(norm_load)
+                );
 
     always #2 clk = ~clk;
 
@@ -39,7 +47,7 @@ module T_FPA_Top;
         #2  start = 1;
         #5  start = 0;
     
-        #10 $finish;
+        #50 $finish;
     end
 
 endmodule
